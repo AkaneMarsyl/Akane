@@ -57,7 +57,7 @@
     define('THREADS_PER_PAGE', 5); //nombres de sujets par pages
     define('MAX_PAGES', 10); //nombre maximum de pages
     define('INDEX_PREVIEW', 5); //nombre de réponses à affichier par sujet dans l'index
-    define('PASSWORD_SALT', '$2y$10$'.'8CnXk8bNmsTEddHBed9mum'); //sel de chiffrement. 22 caractères obligatoires pour blowfish
+    define('PASSWORD_SALT', '$2y$10$'.'**********************'); //sel de chiffrement. 22 caractères obligatoires pour blowfish
 
     //Messages
     define('COOLDOWN', 15); //temps à attendre entre deux messages
