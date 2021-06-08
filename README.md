@@ -1,5 +1,5 @@
 # Akane
-Akane is a french image-board project created for https://www.akane-ch.org
+Akaihane is a french image-board project created for https://www.akane-ch.org
 
 Installation instructions are described in french in the source code. Here a translation of the setup.
 
