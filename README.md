@@ -1,7 +1,7 @@
 # Akane
 Akaihane Channel is a french image-board project created for https://www.akane-ch.org
 
-Installation instructions are described in french in the source code. Here a translation of the setup.
+Installation instructions are described in french in the source code. Here is a translation of the setup.
 
 1) Create a directory in the root folder. Paste the akane.php file and create the following folders res/ src/ and thumb/.
 
