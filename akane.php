@@ -102,7 +102,7 @@
     $upfile=isset($_FILES["upfile"]["tmp_name"]) ? $_FILES["upfile"]["tmp_name"] : "";
 
     //Initialisation de la base de données
-    if(!$pdo = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC])){
+    if(!$pdo = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD, [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING])){
         serverMessage('Échec de la connection à la base de données');
         die();
     }
@@ -138,7 +138,7 @@
                 `md5` varchar(255) DEFAULT NULL,
                 `file` varchar(255) DEFAULT NULL,
                 `thumbnail` varchar(255) DEFAULT NULL,
-                `replies` text NOT NULL,
+                `replies` text NULL,
                 `password` varchar(255) DEFAULT NULL,
                 PRIMARY KEY (`id`)
                 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;');
@@ -953,14 +953,12 @@
         if(!empty($password)){
             $password = password_hash($password, PASSWORD_BCRYPT);
         }else{
-            $password = '';
+            $password = null;
         }
 
-        $replies = '';
-
-        $sql = 'INSERT INTO '.DB_POST_TABLE.' (parent, name, tripcode, IP, email, subject, message, upfile_name, md5, file, thumbnail, replies, password) VALUES (:parent, :name, :tripcode, :IP, :email, :subject, :message, :upfile_name, :md5, :file, :thumbnail, :replies, :password)';
+        $sql = 'INSERT INTO '.DB_POST_TABLE.' (parent, name, tripcode, IP, email, subject, message, upfile_name, md5, file, thumbnail, password) VALUES (:parent, :name, :tripcode, :IP, :email, :subject, :message, :upfile_name, :md5, :file, :thumbnail, :password)';
         $stmt= $pdo->prepare($sql);
-        $stmt->execute(compact('parent', 'name', 'tripcode', 'IP', 'email', 'subject', 'message', 'upfile_name', 'md5', 'file', 'thumbnail', 'replies', 'password'));
+        $stmt->execute(compact('parent', 'name', 'tripcode', 'IP', 'email', 'subject', 'message', 'upfile_name', 'md5', 'file', 'thumbnail', 'password'));
 
         $id = $pdo->lastInsertId();
 
