@@ -23,3 +23,5 @@ Installation instructions are described in french in the source code. Here is a 
     3) Edit the parameters.
 
     4) Execute akane.php in a web browser.
+
+Requierments : PHP, GD, PDO, MySQL. Nothing too specific, just run a Wamp server and it works.
