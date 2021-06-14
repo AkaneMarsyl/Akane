@@ -43,11 +43,11 @@
 /*-------Paramètres--------*/
 
     //Logo
-    define('LOGO','/img/logo.svg');
+    define('LOGO','');
 
     //Environnement
-    define('TITLE', '/a/ - Anime'); //nom du forum
-    define('ROOT','/a/'); //racine du forum
+    define('TITLE', '/e/ - Example'); //nom du forum
+    define('ROOT','/e/'); //racine du forum
     define('RES_FOLDER', 'res/'); //dossier des pages
     define('IMG_FOLDER', 'src/'); //dossier des images
     define('THUMB_FOLDER', 'thumb/'); //dossier des miniatures
@@ -82,10 +82,9 @@
     define('DB_PASSWORD', '');
     define('DB_NAME','imageboard');
     define('DB_HOST','localhost');
-    define('DB_POST_TABLE','a_posts');
+    define('DB_POST_TABLE','e_posts');
     define('DB_BANS_TABLE', 'bans');
-    define('DB_ADMINS_TABLE', 'admin');
-
+    define('DB_ADMINS_TABLE', 'admins');
 
 /*-------Initialisation-------*/
 
@@ -162,6 +161,7 @@
             <meta http-equiv="pragma" content="no-cache">
             <meta name="viewport" content="width=device-width,initial-scale=1">
             <meta name="keywords" content="imageboard, forum, culture, japonaise, japon, anime, manga, nsfw">
+            <link rel="shortcut icon" href="/img/favicon.ico">
             <title>'.TITLE.'</title>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script>
@@ -179,7 +179,7 @@
                         }
                     }
 
-                    $(\'.backlink\').mouseenter(function(){
+                    $(\'.backlink, .replyLink\').mouseenter(function(){
                         var num = $(this).text().substr(2);
                         var ptop = $(this).offset().top - 20;
                         var pleft = $(this).offset().left;
@@ -239,6 +239,34 @@
                     background-color:#82a1c1;
                     color:white;
                     font-weight:bold;
+                }
+                .doc{
+                    width:100%;
+                    max-width:750px;
+                    margin:auto;
+                }
+                .box{
+                    background-color:#E6F0FD;
+                    box-shadow:0px 0px 6px 0.5px #000000;
+                }
+                .boxtitle h5{
+                    background:linear-gradient(180deg, rgb(58, 114, 255), rgb(81, 99, 128));
+                    color:#FFFFFF;
+                    font-size:16pt;
+                    font-weight:bold;
+                    margin-bottom: 0px;
+                    margin-top:8px;
+                    padding-left:8px;
+                }
+                .boxcontent{
+                    padding:8px;
+                }
+                .boardtype{
+                    font-weight:bold;
+                }
+                .lastsubjects{
+                    width:100%;
+                    border: 1px solid black;
                 }
                 hr{
                     clear:both;
@@ -312,6 +340,16 @@
                     margin-bottom:8px;
                     float:left;
                 }
+                .catalogrow{
+                    cursor:pointer;
+                }
+                .catalogrow:hover{
+                    background-color:#c2c2c2;
+                }
+                .cataloglabel{
+                    background:linear-gradient(180deg, rgb(124, 180, 240), rgb(104, 134, 183));
+                    color:white;
+                }
                 .subject{
                     color:#cc1105;
                     font-size:16px;
@@ -335,7 +373,7 @@
         global $logged;
         
         $data .= '<div>
-            '.($logged ? ' [<span style="color:red;font-weight:bold;">Connecté: '.$_SESSION['auth']['name'].'</span>] [<a href="akane.php?admin&logout">Se déconnecter</a>] [<a href="akane.php?admin&banlist">Liste des bannis</a>]' : ''/*'[<a href="'.ROOT.'akane.php?admin">Administration</a>]'*/).'
+            [<a href="/">Accueil</a>]'.($logged ? ' [<span style="color:red;font-weight:bold;">Connecté: '.$_SESSION['auth']['name'].'</span>] [<a href="akane.php?admin&logout">Se déconnecter</a>] [<a href="akane.php?admin&banlist">Liste des bannis</a>]' : ''/*'[<a href="'.ROOT.'akane.php?admin">Administration</a>]'*/).'
         </div>
         <div class="logo">
             <img src="'.LOGO.'">
@@ -363,14 +401,14 @@
                     </tr>';
                     if($id == 0){
                     $data .= '<tr>
-                        <td class="formlabel">Sujet</td><td><input type="text" name="subject" size="40"><input type="submit" name="submit" value="Envoyer"></td>
+                        <td class="formlabel">Sujet</td><td><input type="text" name="subject"><input type="submit" name="submit" value="Envoyer"></td>
                     </tr>';
                     }
                     $data .= '<tr>
-                        <td class="formlabel">Message</td><td><textarea id="message" name="message" max="8000" rows="6" cols="48"></textarea></td>
+                        <td class="formlabel">Message</td><td><textarea id="message" name="message" max="8000" style="width:100%;height:80px;"></textarea></td>
                     </tr>
                     <tr>
-                        <td class="formlabel">Fichier</td><td><input type="file" name="upfile"></td>
+                        <td class="formlabel">Fichier</td><td><input type="file" name="upfile" style="width:100%;"></td>
                     </tr>
                     <tr>
                         <td class="formlabel">Mot de passe</td><td><input type="password" name="password" size="8"><small> (pour la suppression du message)</small></td>
@@ -395,7 +433,7 @@
         global $logged;
 
         $data .= '<hr>
-        '.($id ? '[<a href="'.($logged ? 'akane.php?admin&page=0' : ROOT).'">Index</a>] ' : '').(!$position  ? '[<a href="#down">Bas de page</a>]' : '[<a href="#up">Haut de page</a>]').'
+        '.($id ? '[<a href="'.($logged ? 'akane.php?admin&page=0' : ROOT).'">Index</a>] ' : '').(!$position  ? '[<a href="'.ROOT.'catalogue">Catalogue</a>] [<a href="#down">Bas de page</a>]' : '[<a href="#up">Haut de page</a>]').'
         <br>';
     }
 
@@ -409,7 +447,7 @@
         $OP = $stmt->fetch();
 
         $data .= '<hr>
-        <a id="'.$OP['id'].'"></a>
+        <div id="'.$OP['id'].'">
         Fichier:<a href="'.ROOT.IMG_FOLDER.$OP['file'].'" target="_blank">
             '.(strlen($OP['upfile_name']) > 20 ? substr($OP['upfile_name'], 0, 20).'...'.substr($OP['upfile_name'], -4) : $OP['upfile_name']).'
         </a>
@@ -427,9 +465,7 @@
             '.date('d/m/y \à H:i:s', strtotime($OP['date'])).'
         </span>
         <span>
-            <a href="'.ROOT.RES_FOLDER.$OP['id'].'#'.$OP['id'].'">No.</a>
-            <a href="'.ROOT.RES_FOLDER.$OP['id'].'#q'.$OP['id'].'" '.
-            (!$index ? 'onclick="javascript:quotePost(\'>>'.$OP['id'].'\')"' : '').'>'.$OP['id'].'</a>'.
+            <a href="'.ROOT.RES_FOLDER.$OP['id'].'#'.$OP['id'].'">No.</a><a href="'.ROOT.RES_FOLDER.$OP['id'].'#q'.$OP['id'].'"'.(!$index ? 'onclick="javascript:quotePost(\'>>'.$OP['id'].'\')"' : null).'>'.$OP['id'].'</a>'.
             ($OP['locked'] ? ' [<span class="postStatus">Verrouillé</span>]' : '').
             ($OP['sticky'] ? ' [<span class="postStatus">Épinglé</span>]' : '').
             ($index ? '&nbsp;<button><a href="'.($logged ? 'akane.php?admin&res='.$OP['id'] : ROOT.RES_FOLDER.$OP['id']).'">Répondre</a></button>' : '').
@@ -446,7 +482,8 @@
         <p>
             '.$OP['message'].'
         </p>
-        <br>';
+        <br>
+        </div>';
     }
 
     /*Réponses*/
@@ -499,6 +536,48 @@
             </table>';
             $counter++;
         }
+    }
+
+    /*Catalogue*/
+    function catalog(){
+
+        global $pdo;
+
+        $data = '';
+        head($data);
+        title($data);
+        $data .= '<hr>
+        [<a href="'.ROOT.'">Index</a>]
+        <hr>
+        <div class="box">
+        <div class="boxtitle">
+            <h5>Catalogue</h5>
+        </div>
+        <div class="boxcontent">
+            <table class="lastsubjects">
+                <tr>
+                    <td class="cataloglabel">No.</td>
+                    <td class="cataloglabel">Sujet/Message</td>
+                    <td class="cataloglabel">Auteur</td>
+                    <td class="cataloglabel">Date</td>
+                    <td class="cataloglabel">Réponses</td>
+                </tr>';
+            $posts = $pdo->query('SELECT * FROM '.DB_POST_TABLE.' WHERE parent = 0 ORDER BY sticky DESC, bump DESC')->fetchAll();
+            foreach($posts as $post){
+                $data .= '
+                <tr class="catalogrow" onclick="window.open(\''.ROOT.RES_FOLDER.$post['id'].'\')">
+                    <td>'.$post['id'].'</td>
+                    <td>'.($post['subject'] ? '<strong>'.substr($post['subject'], 0, 30).'</strong><br>' : '').substr($post['message'], 0, 30).'</td>
+                    <td>'.$post['name'].'</td>
+                    <td>'.date('d/m/y \à H:i:s', strtotime($post['date'])).'</td>
+                    <td>'.countReplies($post['id']).'</td>
+                </tr>';
+            }
+            $data .= '</table>
+                </div>';
+            $output = fopen('catalogue.html', 'w') or die(serverMessage('Impossible de trouver le fichier'));
+            fwrite($output, $data);
+            fclose($output);
     }
 
     /*Accès administration*/
@@ -570,14 +649,18 @@
                             <td style="border:1px solid black;">'.$post['IP'].'</td>
                             <td style="border:1px solid black;">'.$post['id'].'</td>';
                         if(!empty($post['thumbnail'])){
-                            $data .= '<td style="border:1px solid black;"><img src="'.ROOT.THUMB_FOLDER.$post['thumbnail'].'" width="124"></td>';
+                            $data .= '<td style="border:1px solid black;"><img src="'.ROOT.THUMB_FOLDER.$post['thumbnail'].'" height="124"></td>';
                         }
                         $data .= '<td style="border:1px solid black;">'.$post['message'].'</td>
                         <td style="border:1px solid black;">
                             <select name="reason">
-                                <option value="règle1">règle1</option>
-                                <option value="règle2">règle2</option>
-                                <option value="règle3">règle3</option>
+                                <option value="Contenu illégal.">Contenu illégal</option>
+                                <option value="Message troll.">Troll</option>
+                                <option value="Shitpost.">Shitpost</option>
+                                <option value="Spam">Spam</option>
+                                <option value="Contenu NSFW en dehors des forums NSFW">NSFW</option>
+                                <option value="Partage d\'infos personnelles">Infos persos</option>
+                                <option value="Pas de pub à but lucratif.">Publicité lucrative</option>
                             </select>
                         </td>
                         <td style="border:1px solid black;">
@@ -972,8 +1055,9 @@
     /*Formate le message*/
     function formatMessage($message, $parent){
 
+        $message = preg_replace("~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~", "<a href=\"\\0\" target=\"_blank\" style=\"text-decoration:underline;\">\\0</a>", $message);
         $message = preg_replace('/(&gt;&gt;)([0-9]+)/', '<a class="replyLink" href="'.ROOT.RES_FOLDER.$parent.'#${2}">>>${2}</a>', $message);
-        $message = preg_replace('/^(&gt;[^\>](.*))/m', '<span class="quote">>${1}</span>', $message);
+        $message = preg_replace('/^(&gt;[^\>](.*))/m', '<span class="quote">${1}</span>', $message);
 
         return $message;
     }
@@ -1075,8 +1159,10 @@
                 $pdo->query('DELETE FROM '.DB_POST_TABLE.' WHERE id = '.$id);
                 @unlink($base_dir.ROOT.IMG_FOLDER.$file);
                 @unlink($base_dir.ROOT.THUMB_FOLDER.$thumbnail);
+                $logged = false;
                 updateThread($parent);
                 update();
+                $logged = true;
             }
         }else{
             header('Refresh: 2; URL='.ROOT);
@@ -1279,6 +1365,7 @@
             serverMessage('Sujet No.'.$id.' envoyé avec succès !');
         }
         update();
+        catalog();
     
     }
     if(isset($_GET['admin'])){ //Accès à l'administration
