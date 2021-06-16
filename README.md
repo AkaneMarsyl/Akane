@@ -25,3 +25,13 @@ Installation instructions are described in french in the source code. Here is a 
     4) Execute akane.php in a web browser.
 
 Requierments : PHP, GD, PDO, MySQL. Nothing too specific, just run a Wamp server and it works.
+
+Features :
+- sage
+- admin tools (delete, ban, unban, lock, sticky, etc...)
+- tripcodes/capcodes
+- inline catalog view
+- Search engine links
+- Duplicate files protection
+- Mouse hover on >>quotes makes them pop-up
+- Anti-spam cooldown
