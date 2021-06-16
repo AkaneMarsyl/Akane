@@ -35,3 +35,8 @@ Features :
 - Duplicate files protection
 - Mouse hover on >>quotes makes them pop-up
 - Anti-spam cooldown
+
+Recent changes:
+- Change the look
+- Better display on small devices
+- Reply form at the bottom seems more logical.
