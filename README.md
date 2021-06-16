@@ -37,6 +37,6 @@ Features :
 - Anti-spam cooldown
 
 Recent changes:
-- Change the look
+- Changed the look
 - Better display on small devices
-- Reply form at the bottom seems more logical.
+- Reply form was moved at the bottom.
