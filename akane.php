@@ -42,8 +42,10 @@
 
 /*-------Paramètres--------*/
 
+    /*-------Paramètres--------*/
+
     //Logo
-    define('LOGO','');
+    define('LOGO','/img/logo.svg');
 
     //Environnement
     define('TITLE', '/e/ - Example'); //nom du forum
@@ -56,7 +58,7 @@
     define('MAX_REPLIES', 200); //réponses max par sujet
     define('THREADS_PER_PAGE', 5); //nombres de sujets par pages
     define('MAX_PAGES', 10); //nombre maximum de pages
-    define('INDEX_PREVIEW', 5); //nombre de réponses à afficher par sujet dans l'index
+    define('INDEX_PREVIEW', 5); //nombre de réponses à affichier par sujet dans l'index
     define('PASSWORD_SALT', '$2y$10$'.'**********************'); //sel de chiffrement. 22 caractères obligatoires pour blowfish
 
     //Messages
@@ -202,13 +204,16 @@
                     height:100%;
                 }
                 html, body{
-                    background:linear-gradient(180deg, rgb(105, 148, 255) 0%, rgb(164, 199, 255) 500px);
+                    background:linear-gradient(180deg, rgb(44, 156, 255) 0%, rgb(240, 240, 240) 200px);
                 }
                 body{
                     font-family:Arial;
                     font-size:12pt;
                     margin:0;
                     padding:8px;
+                }
+                footer{
+                    font-size:8pt;
                 }
                 .logo{
                     margin:0;
@@ -219,21 +224,18 @@
                     max-width:750px;
                 }
                 .postform{
-                    background-color:#c9ebff;
                     font-size:16px;
-                    margin:0 auto;
-                    margin-bottom:12px;
-                    text-align: left;
-                    padding: 12px;
-                    border-radius: 12px;
-                    box-shadow: 0px 2px 5px black;
+                    margin:0;
+                    text-align:left;
+                    width:100%;
+                    padding-right:8px;
                 }
                 .postform ul{
                     font-size:8pt;
                     font-weight:normal;
                     padding:0;
                     margin:0;
-                    margin-left:8px; 
+                    margin-left:8px;
                 }
                 .formlabel{
                     background-color:#82a1c1;
@@ -285,6 +287,7 @@
                 }
                 button a{
                     color:white;
+                    text-decoration:none;
                 }
                 button a:hover{
                     color:white;
@@ -308,20 +311,31 @@
                     float:left
                 }
                 .reply, .floatReply{
-                    background-color:#c9ebff;
+                    background-color:#ffffff;
                     box-shadow: 0px 0px 4px #040404;
                     border-radius: 12px;
-                    padding: 10px;
+                    padding:0;
+                    padding-bottom:8px;
                 }
                 .floatReply img{
                     margin-right:12px;
                 }
                 .reply:target{
-                    background-color:#aad7ff;
+                    background-color:#c4e3ff;
                 }
                 .replyLink{
                     color:red;
                     text-decoration:underline;
+                }
+                .replyhead{
+                    font-size:10pt;
+                    margin: 0;
+                    border-radius: 12px 12px 0px 0px;
+                    padding: 8px;
+                    background: linear-gradient(rgb(179, 212, 255),rgb(115, 164, 217));
+                }
+                .replybody{
+                    padding: 8px;
                 }
                 .backlink{
                     font-size:10pt;
@@ -335,6 +349,19 @@
                 }
                 form img{
                     margin-right:12px;
+                }
+                .navlinks{
+                    background:linear-gradient(rgb(143, 181, 240),rgb(125, 176, 221),rgb(77, 162, 213));
+                    padding:8px;
+                    margin-top:8px;
+                    margin-bottom:8px;
+                    box-shadow: 0px 0px 4px 1px #3b708a;
+                }
+                .navlinks button{
+                    background: linear-gradient(rgb(80, 148, 255),rgb(55, 88, 109));
+                    font-size: 14pt;
+                    font-weight: bold;
+                    margin-right: 8px;
                 }
                 .OPImg{
                     margin-bottom:8px;
@@ -373,7 +400,7 @@
         global $logged;
         
         $data .= '<div>
-            [<a href="/">Accueil</a>]'.($logged ? ' [<span style="color:red;font-weight:bold;">Connecté: '.$_SESSION['auth']['name'].'</span>] [<a href="akane.php?admin&logout">Se déconnecter</a>] [<a href="akane.php?admin&banlist">Liste des bannis</a>]' : ''/*'[<a href="'.ROOT.'akane.php?admin">Administration</a>]'*/).'
+            '.($logged ? ' [<span style="color:red;font-weight:bold;">Connecté: '.$_SESSION['auth']['name'].'</span>] [<a href="akane.php?admin&logout">Se déconnecter</a>] [<a href="akane.php?admin&banlist">Liste des bannis</a>]' : ''/*'[<a href="'.ROOT.'akane.php?admin">Administration</a>]'*/).'
         </div>
         <div class="logo">
             <img src="'.LOGO.'">
@@ -388,43 +415,49 @@
     /*Formulaire*/
     function form(&$data, $id = null){
 
-        $data.='<div>
+        $data.='
+        <div class="box" style="max-width:750px;">
+            <div class="boxtitle">
+                <h5>'.(!$id ? 'Créer un nouveau sujet' : 'Répondre au sujet No.'.$id).'</h5>
+            </div>
             <form action="'.ROOT.'akane.php" method="post" enctype="multipart/form-data">
-                <h2 align="center">'.(!$id ? 'Créer un nouveau sujet' : 'Répondre au sujet No.'.$id).'</h2>
                 <input type="hidden" name="parent" value="'.(!$id ? '0' : $id).'">
                 <table class="postform">
                     <tr>
-                        <td class="formlabel">Nom</td><td><input type="text" name="name" placeholder="Sine Nomine"></td>
+                        <td><input type="text" placeholder="Nom (facultatif)" name="name" placeholder="Sine Nomine" style="width:100%;"></td>
                     </tr>
                     <tr>
-                        <td class="formlabel">Email</td><td><input type="text" name="email">'.($id > 0 ? '<input type="submit" name="submit" value="Envoyer">' : '').'</td>
+                        <td><input type="text" placeholder="E-mail (facultatif)" name="email" style="width:100%;"></td>
                     </tr>';
                     if($id == 0){
                     $data .= '<tr>
-                        <td class="formlabel">Sujet</td><td><input type="text" name="subject"><input type="submit" name="submit" value="Envoyer"></td>
+                        <td><input type="text" placeholder="Sujet (facultatif)" name="subject" style="width:100%;"></td>
                     </tr>';
                     }
                     $data .= '<tr>
-                        <td class="formlabel">Message</td><td><textarea id="message" name="message" max="8000" style="width:100%;height:80px;"></textarea></td>
+                        <td><textarea id="message" placeholder="Message" name="message" max="8000" style="width:100%;height:80px;"></textarea></td>
                     </tr>
                     <tr>
-                        <td class="formlabel">Fichier</td><td><input type="file" name="upfile" style="width:100%;"></td>
+                        <td><input type="file" name="upfile"></td>
                     </tr>
                     <tr>
-                        <td class="formlabel">Mot de passe</td><td><input type="password" name="password" size="8"><small> (pour la suppression du message)</small></td>
+                        <td><input type="password" placeholder="Mot de passe (pour supprimer)" name="password" style="width:100%;"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="submit" name="submit" value="Envoyer"></td>
                     </tr>
                     <tr>
                         <th colspan="2">
                             <ul>
                                 <li>Il faut au moins une image ou du texte pour répondre.</li>
                                 <li>Les formats supportés sont JPG, PNG et GIF.</li>
+                                <li>Taille maximale du fichier: 3Mo.</li>
                             </ul>
                         </th>
                     </tr>
                 </table>
             </form>
-        </div>
-        <form action="'.ROOT.'akane.php?delete" method="get">';
+        </div>';
     }
 
     /*Liens de navigation*/
@@ -432,9 +465,19 @@
         
         global $logged;
 
-        $data .= '<hr>
-        '.($id ? '[<a href="'.($logged ? 'akane.php?admin&page=0' : ROOT).'">Index</a>] ' : '').(!$position  ? '[<a href="'.ROOT.'catalogue">Catalogue</a>] [<a href="#down">Bas de page</a>]' : '[<a href="#up">Haut de page</a>]').'
-        <br>';
+        $data .= '
+        <div class="navlinks">
+        <span>
+        <button><a href="/">Accueil</a></button>'.($id ? '<button><a href="'.($logged ? 'akane.php?admin&page=0' : ROOT).'">Index</a></button>' : '').'<button><a href="'.ROOT.'catalogue">Catalogue</a></button>'.(!$position  ? '<button><a href="#down">&#9660;</a></button>' : '<button><a href="#up">&#9650;</a></button>').'
+        </span>
+        '.(!$position ? '
+        </div>
+        <form action="'.ROOT.'akane.php?delete" method="get">' : '
+        <span style="float:right;">
+            <input type="password" placeholder="Mot de passe" name="password" size="8"><input type="submit" name="deletePost" value="Supprimer">
+        </span>
+        </div>
+        </form>');
     }
 
     /*OP*/
@@ -446,11 +489,12 @@
         $stmt->execute(['id' => $id]);
         $OP = $stmt->fetch();
 
-        $data .= '<hr>
+        $data .= '
         <div id="'.$OP['id'].'">
         Fichier:<a href="'.ROOT.IMG_FOLDER.$OP['file'].'" target="_blank">
             '.(strlen($OP['upfile_name']) > 20 ? substr($OP['upfile_name'], 0, 20).'...'.substr($OP['upfile_name'], -4) : $OP['upfile_name']).'
         </a>
+        [<a target="_blank" href="https://saucenao.com/search.php?url=https://www.akane-ch.org'.ROOT.THUMB_FOLDER.$OP['thumbnail'].'">SauceNao</a>]
         <br>
         <a href="'.ROOT.IMG_FOLDER.$OP['file'].'" target="_blank">
             <img class="OPImg" src="'.ROOT.THUMB_FOLDER.$OP['thumbnail'].'" title="'.$OP['upfile_name'].'" alt="'.$OP['upfile_name'].'">
@@ -507,30 +551,34 @@
                         >>
                     </td>
                     <td id="'.$reply['id'].'" class="reply">
-                        <input type="checkbox" name="del" value="'.$reply['id'].'">
-                        <span class="name">
-                            '.(!empty($reply['email']) ? '<a href="mailto:'.$reply['email'].'">'.$reply['name'].'</a>' : $reply['name']).'
-                        </span>
-                        '.(!empty($reply['tripcode']) ? '<span class="tripcode">'.$reply['tripcode'].'</span>' : '').'
-                        <span>
-                            '.date('d/m/y \à H:i:s', strtotime($reply['date'])).'
-                        </span>
-                        <span>
-                            <a href="'.ROOT.RES_FOLDER.$reply['parent'].'#'.$reply['id'].'">No.</a><a href="'.ROOT.RES_FOLDER.$reply['parent'].'#q'.$reply['id'].'" '.(!$index ? 'onclick="javascript:quotePost(\'>>'.$reply['id'].'\')"' : '').'>'.$reply['id'].'</a>'.($logged ? ' ['.$reply['IP'].'] [<a href="akane.php?admin&del='.$reply['id'].'">Supprimer</a>]  [<a href="akane.php?admin&ban='.$reply['id'].'">Bannir</a>]' : '').' '.$reply['replies'].'
-                        </span>
-                        <br>';
-                        if(!empty($reply['file'])){
-                            $data .= 'Fichier:<a href="'.ROOT.IMG_FOLDER.$reply['file'].'" target="_blank">
-                            '.(strlen($reply['upfile_name']) > 20 ? substr($reply['upfile_name'], 0, 20).'...'.substr($reply['upfile_name'], -4) : $reply['upfile_name']).'
-                        </a>
-                        <br>
-                        <a href="'.ROOT.IMG_FOLDER.$reply['file'].'" target="_blank">
-                            <img class="postImg" src="'.ROOT.THUMB_FOLDER.$reply['thumbnail'].'" title="'.$reply['upfile_name'].'" alt="'.$reply['upfile_name'].'">
-                        </a>';
-                        }
-                        $data .= '<p>
-                            '.$reply['message'].'
-                        </p>
+                        <div class="replyhead">
+                            <input type="checkbox" name="del" value="'.$reply['id'].'">
+                            <span class="name">
+                                '.(!empty($reply['email']) ? '<a href="mailto:'.$reply['email'].'">'.$reply['name'].'</a>' : $reply['name']).'
+                            </span>
+                            '.(!empty($reply['tripcode']) ? '<span class="tripcode">'.$reply['tripcode'].'</span>' : '').'
+                            <span>
+                                '.date('d/m/y \à H:i:s', strtotime($reply['date'])).'
+                            </span>
+                            <span>
+                                <a href="'.ROOT.RES_FOLDER.$reply['parent'].'#'.$reply['id'].'">No.</a><a href="'.ROOT.RES_FOLDER.$reply['parent'].'#q'.$reply['id'].'" '.(!$index ? 'onclick="javascript:quotePost(\'>>'.$reply['id'].'\')"' : '').'>'.$reply['id'].'</a>'.($logged ? ' ['.$reply['IP'].'] [<a href="akane.php?admin&del='.$reply['id'].'">Supprimer</a>]  [<a href="akane.php?admin&ban='.$reply['id'].'">Bannir</a>]' : '').' '.$reply['replies'].'
+                            </span>
+                            <br>';
+                            if(!empty($reply['file'])){
+                                $data .= 'Fichier:<a href="'.ROOT.IMG_FOLDER.$reply['file'].'" target="_blank">
+                                '.(strlen($reply['upfile_name']) > 20 ? substr($reply['upfile_name'], 0, 20).'...'.substr($reply['upfile_name'], -4) : $reply['upfile_name']).'
+                            </a>
+                            [<a target="_blank" href="https://saucenao.com/search.php?url=https://www.akane-ch.org'.ROOT.THUMB_FOLDER.$reply['thumbnail'].'">SauceNao</a>]
+                        </div>
+                        <div class="replybody">
+                            <a href="'.ROOT.IMG_FOLDER.$reply['file'].'" target="_blank">
+                                <img class="postImg" src="'.ROOT.THUMB_FOLDER.$reply['thumbnail'].'" title="'.$reply['upfile_name'].'" alt="'.$reply['upfile_name'].'">
+                            </a>';
+                            }
+                            $data .= '<p>
+                                '.$reply['message'].'
+                            </p>
+                        </div>
                     </td>
                 </tr>
             </table>';
@@ -748,7 +796,7 @@
         $pageTotal = ceil($threadCount / THREADS_PER_PAGE);
 
         if($logged){
-            $data .= '<hr>
+            $data .= '
             <div>
                 <table class="paginate">
                 <tr>
@@ -787,10 +835,7 @@
     /*Pied de page*/
     function footer(&$data){
 
-        $data.='<div align="right">
-            Mot de passe:<input type="password" size="8" name="password"><input type="submit" name="deletePost" value="Supprimer">
-        </div>
-        </form>
+        $data.='
         <footer id="down">
             <p style="text-align:center">
                 - Les utilisateurs seuls sont responsables des messages et images qu\'ils envoient. Akane-ch.org, ainsi que son administration, se dégagent de toute opinion ou intention qui pourrait y être exprimée. -
@@ -846,6 +891,7 @@
                 $omitted = countReplies($OP['id']) - 5;
                 $omitted <= 0 ? '' : $data .= '<span style="color:grey;">'.$omitted.' réponses omises, cliquez sur \'Répondre\' pour tout voir.</span>';
                 replies($data, $OP['id'], true);
+                $data .= '<hr>';
             }
             navlinks($data, null, true);
             paginate($data, $i, $threadCount);
@@ -870,11 +916,11 @@
         $data='';
         head($data);
         title($data);
-        form($data, $id);
         navlinks($data, $id);
         OP($data, $id);
         replies($data, $id);
         navlinks($data, $id, true);
+        form($data, $id);
         $data .= '<hr>';
         footer($data);
         if(!$logged){
@@ -1374,6 +1420,7 @@
     }
     if(isset($del)){
         deletePost($del, $password);
+        header('Refresh: 2; URL='.ROOT);
         serverMessage('Message No.'.$del.' supprimé.');
     }
 ?>
