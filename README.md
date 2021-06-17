@@ -37,6 +37,7 @@ Features :
 - Anti-spam cooldown
 
 Recent changes:
-- Changed the look
-- Better display on small devices
-- Reply form was moved at the bottom.
+- Now a counter for replies, '001, 002, etc...', is displayed in lieu of '>>'
+- Added a function to rebuild an entire board so I don't have to do it by hand on each thread
+- Message displayed on the catalog view without the html tags
+- Minor bugs fixed
