@@ -42,8 +42,6 @@
 
 /*-------Paramètres--------*/
 
-    /*-------Paramètres--------*/
-
     //Logo
     define('LOGO','/img/logo.svg');
 
@@ -167,6 +165,9 @@
             <title>'.TITLE.'</title>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script>
+                function reloadPage(){
+                    location.reload(true);
+                }
                 function quotePost(postId){
                     $("#message").val($("#message").val() + postId + "\n").focus();
                     return false;
@@ -280,6 +281,7 @@
                     color:red;
                 }
                 button{
+                    color:white;
                     background-color:#378fea;
                     border-radius:4px;
                     border:none;
@@ -293,6 +295,7 @@
                     color:white;
                 }
                 button:hover{
+                    cursor:pointer;
                     box-shadow:0px 0px 1px 1px #888
                 }
                 .paginate{
@@ -351,6 +354,7 @@
                     margin-right:12px;
                 }
                 .navlinks{
+                    clear:both;
                     background:linear-gradient(rgb(143, 181, 240),rgb(125, 176, 221),rgb(77, 162, 213));
                     padding:8px;
                     margin-top:8px;
@@ -400,7 +404,7 @@
         global $logged;
         
         $data .= '<div>
-            '.($logged ? ' [<span style="color:red;font-weight:bold;">Connecté: '.$_SESSION['auth']['name'].'</span>] [<a href="akane.php?admin&logout">Se déconnecter</a>] [<a href="akane.php?admin&banlist">Liste des bannis</a>]' : ''/*'[<a href="'.ROOT.'akane.php?admin">Administration</a>]'*/).'
+            '.($logged ? ' [<span style="color:red;font-weight:bold;">Connecté: '.$_SESSION['auth']['name'].'</span>] [<a href="akane.php?admin&logout">Se déconnecter</a>] [<a href="akane.php?admin&banlist">Liste des bannis</a>] [<a href="akane.php?admin&rebuildAll">Tout reconstruire</a>]' : ''/*'[<a href="'.ROOT.'akane.php?admin">Administration</a>]'*/).'
         </div>
         <div class="logo">
             <img src="'.LOGO.'">
@@ -416,7 +420,7 @@
     function form(&$data, $id = null){
 
         $data.='
-        <div class="box" style="max-width:750px;">
+        <div class="box" style="max-width:750px;'.(!$id ? 'margin:auto;' : '').'">
             <div class="boxtitle">
                 <h5>'.(!$id ? 'Créer un nouveau sujet' : 'Répondre au sujet No.'.$id).'</h5>
             </div>
@@ -424,7 +428,7 @@
                 <input type="hidden" name="parent" value="'.(!$id ? '0' : $id).'">
                 <table class="postform">
                     <tr>
-                        <td><input type="text" placeholder="Nom (facultatif)" name="name" placeholder="Sine Nomine" style="width:100%;"></td>
+                        <td><input type="text" placeholder="Nom (facultatif)" name="name" style="width:100%;"></td>
                     </tr>
                     <tr>
                         <td><input type="text" placeholder="E-mail (facultatif)" name="email" style="width:100%;"></td>
@@ -468,7 +472,7 @@
         $data .= '
         <div class="navlinks">
         <span>
-        <button><a href="/">Accueil</a></button>'.($id ? '<button><a href="'.($logged ? 'akane.php?admin&page=0' : ROOT).'">Index</a></button>' : '').'<button><a href="'.ROOT.'catalogue">Catalogue</a></button>'.(!$position  ? '<button><a href="#down">&#9660;</a></button>' : '<button><a href="#up">&#9650;</a></button>').'
+        <button><a href="/">Accueil</a></button>'.($id ? '<button><a href="'.($logged ? 'akane.php?admin&page=0' : ROOT).'">Index</a></button>' : '').'<button><a href="'.ROOT.'catalogue">Catalogue</a></button>'.(!$position  ? '<button><a href="#down">&#9660;</a></button>' : '<button><a href="#up">&#9650;</a></button>').'<button type="button" onclick="reloadPage()">Rafraîchir</button>
         </span>
         '.(!$position ? '
         </div>
@@ -509,7 +513,7 @@
             '.date('d/m/y \à H:i:s', strtotime($OP['date'])).'
         </span>
         <span>
-            <a href="'.ROOT.RES_FOLDER.$OP['id'].'#'.$OP['id'].'">No.</a><a href="'.ROOT.RES_FOLDER.$OP['id'].'#q'.$OP['id'].'"'.(!$index ? 'onclick="javascript:quotePost(\'>>'.$OP['id'].'\')"' : null).'>'.$OP['id'].'</a>'.
+            <a href="'.ROOT.RES_FOLDER.$OP['id'].'#'.$OP['id'].'">No.</a><a href="'.ROOT.RES_FOLDER.$OP['id'].'#q'.$OP['id'].'"'.(!$index ? ' onclick="javascript:quotePost(\'>>'.$OP['id'].'\')"' : null).'>'.$OP['id'].'</a>'.
             ($OP['locked'] ? ' [<span class="postStatus">Verrouillé</span>]' : '').
             ($OP['sticky'] ? ' [<span class="postStatus">Épinglé</span>]' : '').
             ($index ? '&nbsp;<button><a href="'.($logged ? 'akane.php?admin&res='.$OP['id'] : ROOT.RES_FOLDER.$OP['id']).'">Répondre</a></button>' : '').
@@ -547,8 +551,8 @@
         foreach(array_reverse($replies) as $reply){
             $data .= '<table style="margin-top:6px;'.($counter < $hidden ? 'display:none;' : '').'">
                 <tr>
-                    <td style="float:left">
-                        >>
+                    <td style="float:left;color:#9b9b9b;">
+                        '.sprintf('%03d', ($counter + 1)).'
                     </td>
                     <td id="'.$reply['id'].'" class="reply">
                         <div class="replyhead">
@@ -574,6 +578,9 @@
                             <a href="'.ROOT.IMG_FOLDER.$reply['file'].'" target="_blank">
                                 <img class="postImg" src="'.ROOT.THUMB_FOLDER.$reply['thumbnail'].'" title="'.$reply['upfile_name'].'" alt="'.$reply['upfile_name'].'">
                             </a>';
+                            }else{
+                                $data .= '</div>
+                                <div class="replybody">';
                             }
                             $data .= '<p>
                                 '.$reply['message'].'
@@ -594,9 +601,10 @@
         $data = '';
         head($data);
         title($data);
-        $data .= '<hr>
-        [<a href="'.ROOT.'">Index</a>]
-        <hr>
+        $data .= '
+        <div class="navlinks">
+            <button><a href="/">Accueil</a></button><button><a href="'.ROOT.'">Index</a></button><button onclick="reloadPage()">Rafraîchir</button>
+        </div>
         <div class="box">
         <div class="boxtitle">
             <h5>Catalogue</h5>
@@ -615,7 +623,7 @@
                 $data .= '
                 <tr class="catalogrow" onclick="window.open(\''.ROOT.RES_FOLDER.$post['id'].'\')">
                     <td>'.$post['id'].'</td>
-                    <td>'.($post['subject'] ? '<strong>'.substr($post['subject'], 0, 30).'</strong><br>' : '').substr($post['message'], 0, 30).'</td>
+                    <td>'.($post['subject'] ? '<strong>'.substr($post['subject'], 0, 80).'</strong><br>' : '').substr(strip_tags($post['message']), 0, 80).'</td>
                     <td>'.$post['name'].'</td>
                     <td>'.date('d/m/y \à H:i:s', strtotime($post['date'])).'</td>
                     <td>'.countReplies($post['id']).'</td>
@@ -631,7 +639,7 @@
     /*Accès administration*/
     function adminView(){
 
-        global $pdo, $logout, $banlist, $del, $logged, $page, $res, $ban, $banIP, $publicban, $liftban, $postID, $submitban, $reason, $length, $stick, $unstick, $lock, $unlock;
+        global $pdo, $logout, $banlist, $del, $rebuildAll, $logged, $page, $res, $ban, $banIP, $publicban, $liftban, $postID, $submitban, $reason, $length, $stick, $unstick, $lock, $unlock;
     
         if($logged){
             if(isset($del)){
@@ -639,8 +647,12 @@
                 header('Refresh: 2; URL='.ROOT.'akane.php?admin');
                 serverMessage('Message No.'.$del.' supprimé.');
                 exit();
-            }
-            if(isset($page)){
+            }elseif(isset($rebuildAll)){
+                rebuildAll();
+                header('Refresh: 2; URL='.ROOT.'akane.php?admin');
+                serverMessage('Forum reconstruit.');
+                exit();
+            }elseif(isset($page)){
                 $data = '';
                 update($page, true);
             }elseif(isset($res)){
@@ -813,7 +825,7 @@
             </table>
             </div>';
         }else{
-        $data .= '<hr>
+        $data .= '
         <div>
             <table class="paginate">
             <tr>
@@ -891,7 +903,9 @@
                 $omitted = countReplies($OP['id']) - 5;
                 $omitted <= 0 ? '' : $data .= '<span style="color:grey;">'.$omitted.' réponses omises, cliquez sur \'Répondre\' pour tout voir.</span>';
                 replies($data, $OP['id'], true);
-                $data .= '<hr>';
+                if($OP !== end($OPs)){
+                    $data .= '<hr>';
+                }
             }
             navlinks($data, null, true);
             paginate($data, $i, $threadCount);
@@ -930,6 +944,22 @@
         }else{
             echo($data);
         }
+    }
+
+    /*Reconstruit tout le forum*/
+    function rebuildAll(){
+
+        global $pdo, $logged;
+
+        $threads = $pdo->query('SELECT id FROM '.DB_POST_TABLE.' WHERE parent = 0')->fetchAll();
+
+        $logged = false;
+        foreach($threads as $thread){
+            updateThread($thread['id']);
+        }
+        update();
+        catalog();
+        $logged = true;
     }
 
     /*Validation du fichier transferé*/
