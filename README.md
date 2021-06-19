@@ -41,3 +41,5 @@ Recent changes:
 - Added a function to rebuild an entire board so I don't have to do it by hand on each thread
 - Message displayed on the catalog view without the html tags
 - Minor bugs fixed
+
+Currently refactoring the application with classes in order to get a clean file that's not 1500 lines long.
