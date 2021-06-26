@@ -29,6 +29,7 @@ Requierments : PHP, GD, PDO, MySQL. Nothing too specific, just run a Wamp server
 Features :
 - sage
 - admin tools (delete, ban, unban, lock, sticky, etc...)
+- reports
 - tripcodes/capcodes
 - inline catalog view
 - Search engine links
@@ -37,7 +38,7 @@ Features :
 - Anti-spam cooldown
 
 Recent changes:
-- Version 2, classes have benn made, more refactoring in the future.
+- Version 2, classes have been made, more refactoring in the future.
 - Now there's a rank system for users. For instance: if(User->rank < 2){do something}.
 - Page generation is simplier now, you can do what you want : Page->head()->title()->footer()->etc... write() to create a file and render() to display it live.
 - The report button really does report now (anyway I'd rather disable it).
