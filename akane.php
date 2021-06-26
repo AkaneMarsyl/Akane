@@ -615,12 +615,23 @@
                 <tr><td><input type="text" placeholder="Sujet (facultatif)" name="subject" style="width: -moz-available;"></td></tr>';
             }
             $this->data .= '
-            <tr><td><textarea id="message" placeholder="Message" name="message" max="8000" style="width: -moz-available;height:80px;"></textarea></td></tr>';if(UPLOADS){$this->data .= '
-            <tr><td><input type="file" name="upfile"></td></tr>';}$this->data .= '
+            <tr><td><textarea id="message" placeholder="Message" name="message" max="8000" style="width: -moz-available;height:80px;"></textarea></td></tr>';
+            if(UPLOADS){$this->data .= '
+                <tr><td><input type="file" name="upfile"></td></tr>';
+            }
+            $this->data .= '
             <tr><td><input type="password" placeholder="Mot de passe (pour supprimer)" name="password" style="width: -moz-available;"></td></tr>
-            <tr><td><input type="submit" name="newpost" value="Envoyer"></td></tr><tr><th colspan="2">
-            <ul><li>Il faut au moins une image ou du texte pour répondre.</li>
-            <li>Les formats supportés sont JPG, PNG et GIF.</li><li>Taille maximale du fichier: 3Mo.</li></ul></th></tr></table></form>
+            <tr><td><input type="submit" name="newpost" value="Envoyer"></td></tr><tr>
+            <th colspan="2">
+            <ul>
+                <li>'.(UPLOADS ? 'Il faut au moins une image ou du texte pour répondre.' : 'Il faut au moins un message pour répondre.').'</li>
+                '.(UPLOADS ? '<li>Les formats supportés sont JPG, PNG et GIF.</li><li>Taille maximale du fichier: 3Mo.</li>' : '').
+                (VIDEO ? '<li>Un lecteur vidéo sera généré s\'il y a un lien</li><li>Plate-formes supportées: Youtube.</li>' : '').'
+            </ul>
+            </th>
+            </tr>
+            </table>
+            </form>
             </div>
             <script>
             dragElement(document.getElementById("move"));
@@ -1187,7 +1198,7 @@
             $page = new Page();
             $post = $item->findOne('id', $id);
             $OP = ($post['parent'] == 0 ? $post : $item->findOne('id', $post['parent']));
-            $title = ROOT . ' - ' . (!empty($OP['subject'] ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30)));
+            $title = ROOT . ' - ' . (!empty($OP['subject']) ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30));
             $parent = $OP['id'];
             $page
                 ->head($title)
@@ -1209,7 +1220,7 @@
             $page = new Page();
             $OPs = $post->findAll('parent', 0);
             foreach($OPs as $OP){
-                $title = ROOT.' - '.(!empty($OP['subject'] ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30)));
+                $title = ROOT.' - '.(!empty($OP['subject']) ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30));
                 $parent = $OP['id'];
                 $page
                 ->head($title)
@@ -1266,11 +1277,11 @@
                 if($OP['locked'] == true || $replyCount >= MAX_REPLIES){
                     die('Ce sujet est verrouillé, vous ne pouvez plus répondre');
                 }
-                $title = ROOT.' - '.(!empty($OP['subject'] ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30)));
+                $title = ROOT.' - '.(!empty($OP['subject']) ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30));
                 $parent = $validPost->parent;
             }else{
                 $OP = $post->findOneByID($validPost->id);
-                $title = ROOT.' - '.($validPost->subject ? $validPost->subject : substr(strip_tags($validPost->message), 0, 30));
+                $title = ROOT.' - '.(!empty($validPost->subject) ? $validPost->subject : substr(strip_tags($validPost->message), 0, 30));
                 $parent = $validPost->id;
             }
             if($postRequest['email'] !== 'sage'){
