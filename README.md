@@ -37,9 +37,8 @@ Features :
 - Anti-spam cooldown
 
 Recent changes:
-- Now a counter for replies, '001, 002, etc...', is displayed in lieu of '>>'
-- Added a function to rebuild an entire board so I don't have to do it by hand on each thread
-- Message displayed on the catalog view without the html tags
-- Minor bugs fixed
-
-Currently refactoring the application with classes in order to get a clean file that's not 1500 lines long.
+Version 2, classes have benn made, more refactoring in the future.
+Now there's a rank system for users. For instance: if(User->rank < 2){do something}.
+Page generation is simplier now, you can do what you want : Page->head()->title()->footer()->etc... write() to create a file and render() to display it live.
+The report button really does report now (anyway I'd rather disable it).
+The post form can be moved with the mouse. It goes up or down the viewport when in mobile view (screen width < 600px).
