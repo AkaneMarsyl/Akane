@@ -447,7 +447,7 @@
             <meta http-equiv="expires" content="0">
             <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT">
             <meta http-equiv="pragma" content="no-cache">
-            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta name="keywords" content="imageboard, forum, culture, japonaise,japon,anime,manga,nsfw">
             <link rel="shortcut icon" href="/img/favicon.ico">
             <title>'.$title. '</title>
@@ -496,7 +496,7 @@
                 position: fixed;
                 top: 0;
                 padding:8px}
-            .logo img{width:96%;max-width:600px;max-height:89px;}
+            .logo img{width:96%;max-width:600px;max-height:7em;}
             .postform{text-align:left;width:100%;}
             .postform ul{font-size:8pt;font-weight:normal;padding:0;margin:0;margin-left:8px;}
             #move {
@@ -552,24 +552,27 @@
                 width: 100%;
                 margin-left: -8px;
                 position: fixed;
-                top: 100px;
+                top: 8em;
                 padding-left:16px;}
             .navlinks button{font-size:14pt;font-weight:bold;margin-right:8px;}
-            .navspacer{margin-bottom:8px;}
+            .useractions{float:right;padding-right:24px;}
             .OPImg{margin-bottom:8px;float:left;}
             .catalogrow{cursor:pointer;}
             .cataloglabel{background-color:#393939;color:white;font-weight:bold;text-align:left;}
             .catalogrow:hover{background-color:#c2c2c2;}
             .subject{color:#cc1105;font-size:16px;font-weight:bold;}.name{color:#0052aa;font-weight:bold;}
             .tripcode{color:#228854;}
-            @media screen and (min-width:600px){
-                #move{position:fixed;}
-                .navspacer{display:none;}
-            }
-            @media screen and (max-width:600px){
+            @media only screen and (max-width: 480px){
                 iframe{width:150px;height:84px;}
                 .counter{display:none;}
-                .boardname h{font-size:14pt;}}
+                .boardname h{font-size:14pt;}
+                .logo{height:5em}
+                .navlinks{top:5em}
+                .navlinks button{font-size:8pt;margin-bottom:8px;}
+                .useractions{font-size:10pt;}
+            }
+            @media only screen and (min-width:800px){
+                #move{position:fixed;}
             }
             </style>
             </head>
@@ -686,12 +689,11 @@
                 ($parent ? '<button><a href="' .
                 ($user ? 'akane.php?admin&page=0' : ROOT) . '">Index</a></button>' : '') . '
                 <button type="button"><a href="' . ROOT . 'catalogue">Catalogue</a></button>
-                <br class="navspacer">
                 <button type="button"><a href="#down">&#9660;</a></button>
                 <button type="button"><a href="#up">&#9650;</a></button>
                 <button onclick="window.location.reload();" type="button">Rafraîchir</button>
                 </span>
-                <span style="float:right;padding-right:24px;">
+                <span class="useractions">
                 <input type="password" placeholder="Mot de passe" name="delpassword" size="8">
                 <input type="submit" name="deletepost" value="Supprimer"><input type="submit" name="report" value="Signaler">
                 </span>
@@ -770,7 +772,7 @@
             foreach(array_reverse($replies) as $reply){
                 $this->data .= '<table style="margin-top:6px;'.($counter < $hidden ? 'display:none;' : '').'">
                 <tr><td class="counter">'.sprintf('%03d', ($counter + 1)). '</td>
-                <td id="'.$reply['id'].'" class="reply anchor">
+                <td id="'.$reply['id'].'" class="reply anchor" '.($user ? 'style="border: 2px solid #'.(substr(md5($reply['IP']), 0, 6)).'"' : '').'>
                 <div class="replyhead">
                 <input type="checkbox" name="del" value="'.$reply['id'].'">
                 <span class="name">'.(!empty($reply['email']) ? '<a href="mailto:'.$reply['email'].'">'.$reply['name'].'</a>' : $reply['name']).'</span>&nbsp;
@@ -935,6 +937,7 @@
                             <option value="Message troll.">Troll</option>
                             <option value="Shitpost.">Shitpost</option>
                             <option value="Spam">Spam</option>
+                            <option value="Signalement abusif">Signalement abusif</option>
                             <option value="Contenu NSFW en dehors des forums NSFW">NSFW</option>
                             <option value="Partage d\'infos personnelles">Infos persos</option>
                             <option value="Pas de pub à but lucratif.">Publicité lucrative</option>
@@ -1025,7 +1028,7 @@
         {
             $this->data.='</form><hr>
             <footer id="down"><p style="text-align:center">
-            - Akane version 2.0 | &copy;2021-'.date('Y', time()).' Akane-ch.org -<br>
+            - Akane version 2.0 | &copy;2021-'.date('Y', time()).' Akane-ch.org | <a href="/cgu">CGU</a> -<br>
             - Les utilisateurs seuls sont responsables des messages et images qu\'ils envoient. Akane-ch.org, ainsi que son administration, se dégagent de toute opinion ou intention qui pourrait y être exprimée. -</p>
             </footer></body></html>';
             return $this;
@@ -1254,7 +1257,11 @@
             }
             $ban = new Ban();
             if($banned = $ban->findOne('IP', $_SERVER['REMOTE_ADDR'])){
-                die('Erreur. Vous êtes banni.<br><small style="font-size:14pt;font-weight:normal;">Ban No.'.$banned['id'].'<br>Motif: '.$banned['reason'].'<br>Date de fin: '.($banned['expires'] > 0 ? date('d/m/y à H:i:s', $banned['expires']) : 'Jamais').'</small>');
+                if($banned['expires'] == 0 || $banned['expires'] < time()){
+                    die('Erreur. Vous êtes banni.<br><small style="font-size:14pt;font-weight:normal;">Ban No.'.$banned['id'].'<br>Motif: '.$banned['reason'].'<br>Date de fin: '.($banned['expires'] > 0 ? date('d/m/y à H:i:s', $banned['expires']) : 'Jamais').'</small>');
+                }else{
+                    $ban->delete(['id' => $banned['id']]);
+                }
             }
             $cooldown = time() + COOLDOWN;
             $post = new Post();
