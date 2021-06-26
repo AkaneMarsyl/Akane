@@ -1156,7 +1156,7 @@
             for($i = $pageNum; $i < $maxPages; $i++){ //Génération des pages à l'index
                 $indexThreads = $post->findAll('parent', 0, 'sticky DESC, bump DESC', $i * THREADS_PER_PAGE, THREADS_PER_PAGE);
                 $page
-                    ->head(TITLE.($i>0?' - page '.$i:''))
+                    ->head(($i > 0 ? ROOT.' - page '.($i+1): TITLE))
                     ->title($user)
                     ->postForm(0)
                     ->navLinks($user, 0, 0);
@@ -1233,6 +1233,16 @@
             }
             BoardController::update();
         }
+        /**
+         * @return void
+         */
+        static function prune(){
+            $post = new Post();
+            $totalOPs = $post->findAll('parent', 0, 'sticky ASC, bump ASC');
+            if(count($totalOPs) > MAX_PAGES * THREADS_PER_PAGE){
+                $post->delete(['id'], $totalOPs[0]['id']);
+            }
+        }
     }
     class PostController
     {
@@ -1281,6 +1291,7 @@
                 $OP = $post->findOneByID($validPost->id);
                 $title = ROOT.' - '.(!empty($validPost->subject) ? $validPost->subject : substr(strip_tags($validPost->message), 0, 30));
                 $parent = $validPost->id;
+                BoardController::prune();
             }
             if($postRequest['email'] !== 'sage'){
                 $validPost->bump($parent);
