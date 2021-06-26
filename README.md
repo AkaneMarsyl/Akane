@@ -43,3 +43,4 @@ Recent changes:
 - Page generation is simplier now, you can do what you want : Page->head()->title()->footer()->etc... write() to create a file and render() to display it live.
 - The report button really does report now (anyway I'd rather disable it).
 - The post form can be moved with the mouse. It goes up or down the viewport when in mobile view (screen width < 600px).
+- When in admin view, posts get a border with a color based on the IP to help figure out who posted what.
