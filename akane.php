@@ -86,8 +86,6 @@
     define('DB_NAME','imageboard');
     define('DB_HOST','localhost');
     define('DB_POST_TABLE','e_posts');
-    define('DB_BANS_TABLE', 'bans');
-    define('DB_ADMINS_TABLE', 'admins');
 
 //--------Connexion--------//
     /**
