@@ -36,7 +36,7 @@ Features :
 - Inline catalog view
 - Search engine links
 - Duplicate files protection
-- Mouse hover on >>quotes makes them pop-up
+- Some fancy JS stuffs
 - Anti-spam cooldown
 
 Recent changes:
