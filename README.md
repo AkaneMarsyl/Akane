@@ -35,7 +35,7 @@ Features :
 - Tripcodes/capcodes
 - Inline catalog view
 - Search engine links
-- Duplicate files protection
+- Duplicate files protection (oops, I forgot this function in the v2)
 - Some fancy JS stuffs
 - Anti-spam cooldown
 
