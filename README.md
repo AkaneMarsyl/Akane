@@ -27,11 +27,13 @@ Installation instructions are described in french in the source code. Here is a 
 Requierments : PHP, GD, PDO, MySQL. Nothing too specific, just run a Wamp server and it works.
 
 Features :
-- sage
-- admin tools (delete, ban, unban, lock, sticky, etc...)
-- reports
-- tripcodes/capcodes
-- inline catalog view
+- Textboard mode
+- Video embding (Youtube only)
+- Sage
+- Admin tools (delete, ban, unban, lock, sticky, etc...)
+- Reports
+- Tripcodes/capcodes
+- Inline catalog view
 - Search engine links
 - Duplicate files protection
 - Mouse hover on >>quotes makes them pop-up
