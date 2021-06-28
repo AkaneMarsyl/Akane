@@ -485,9 +485,13 @@
             </script>
             <style>
             html{height:100%;scroll-behavior: smooth;}
-            html,body{background:#f7f7f7;}
-            body{font-family:Arial;font-size:10pt;margin:0;padding-top:170px;}
+            html,body{background:#d3d3d3;}
+            body{font-family:Arial;font-size:10pt;margin:8px;padding-top:170px;}
             footer{font-size:8pt;}
+            textarea {
+                font-family: Arial;
+                font-size: 10pt;
+            }
             .logo{background: #951818;;
                 width: 100vw;
                 height:106px;
@@ -508,13 +512,12 @@
                 z-index: 10;
               }
             .doc{width:100%;max-width:750px;margin:auto;}
-            .box{background-color:#FFF;box-shadow:0px 0px 2px 0px #000000;}
+            .box{background-color:#FFF;}
             .boxtitle{background:#a2a2a2;color:#FFFFFF;margin:0;font-size:16pt;font-weight:bold;padding-left:8px;}
             .boxcontent{padding:8px;}
             .boardtype{font-weight:bold;}
             .lastsubjects{width:100%;border:1px solid #cacaca;border-spacing:0;}
             hr{clear:both;}
-            .posts{padding:8px;}
             a{color:black;}
             a.anchor {
                 display: block;
@@ -524,7 +527,7 @@
             }
             a:hover{color:red;}
             button{color: white;
-                background-color: #000;
+                background: #2d2d2d;
                 border-radius: 4px;
                 border: none;}
             button a{color:white;text-decoration:none;}
@@ -535,7 +538,7 @@
             .postStatus{color:red;font-weight:bold;}
             .postImg{float:left}
             .counter{float:left;color:#9b9b9b;font-family:Courier;}
-            .reply, .floatReply{background-color:#ffffff;box-shadow: 0px 0px 1px #040404;padding:0;padding-bottom:8px;}
+            .reply, .floatReply{background:#ffffff;box-shadow:0px 0px 1px #a8a8a8;padding:0;padding-bottom:8px;}
             .floatReply img{margin-right:12px;}
             .reply:target{background-color:#bfbfbf;scroll-margin-top: 170px;}
             .replyLink{color:red;text-decoration:underline;}
@@ -548,17 +551,17 @@
             .navlinks{clear: both;
                 padding: 8px;
                 margin-top: -3px;
-                background: black;
-                width: 100%;
+                background: #2d2d2d;
+                width: 100vw;
                 margin-left: -8px;
                 position: fixed;
                 top: 8em;
                 padding-left:16px;}
             .navlinks button{font-size:14pt;font-weight:bold;margin-right:8px;}
-            .useractions{float:right;padding-right:24px;}
+            .useractions{float:right;padding-right:36px;}
             .OPImg{margin-bottom:8px;float:left;}
             .catalogrow{cursor:pointer;}
-            .cataloglabel{background-color:#393939;color:white;font-weight:bold;text-align:left;}
+            .cataloglabel{background:#484848;color:white;font-weight:bold;text-align:left;}
             .catalogrow:hover{background-color:#c2c2c2;}
             .subject{color:#cc1105;font-size:16px;font-weight:bold;}.name{color:#0052aa;font-weight:bold;}
             .tripcode{color:#228854;}
@@ -682,7 +685,7 @@
         public function navLinks(?User $user, int $parent, bool $position): Page
         {
             if(!$position){
-                $this->data .= '<form class="posts" action="'.ROOT.'akane.php" method="get">
+                $this->data .= '<form action="'.ROOT.'akane.php" method="get">
                 <hr>
                 <div class="navlinks">
                 <span><button><a href="/">Accueil</a></button>' .
@@ -712,7 +715,7 @@
          */
         public function OP(array $OP, ?User $user, bool $index): Page
         {
-            $this->data .= '<div id="'.$OP['id'].'" style="scroll-margin-top: 170px;">';
+            $this->data .= '<div id="'.$OP['id'].'" style="scroll-margin-top: 170px;'.($user ? 'border: 4px solid hsl('.(hexdec(substr(md5($OP['IP']), 0, 2))).',100%,75%);' : '').'">';
             if(UPLOADS && !empty($OP['file'])){
                 $this->data .= 'Fichier:<a href="'.ROOT.IMG_FOLDER.$OP['file'].'" target="_blank">'.(strlen($OP['upfile_name']) > 20 ? substr($OP['upfile_name'], 0, 20).'...'.substr($OP['upfile_name'], -4) : $OP['upfile_name']).'</a>
                 [<a target="_blank" href="https://saucenao.com/search.php?url=https://www.akane-ch.org'.ROOT.THUMB_FOLDER.$OP['thumbnail'].'">SauceNao</a>]<br>
@@ -771,8 +774,8 @@
             $counter = 0;
             foreach(array_reverse($replies) as $reply){
                 $this->data .= '<table style="margin-top:6px;'.($counter < $hidden ? 'display:none;' : '').'">
-                <tr><td class="counter">'.sprintf('%03d', ($counter + 1)). '</td>
-                <td id="'.$reply['id'].'" class="reply anchor" '.($user ? 'style="border: 2px solid #'.(substr(md5($reply['IP']), 0, 6)).'"' : '').'>
+                <tr><td class="counter" '.($counter >= MAX_BUMP ? 'style="color:orange;" alt="Le sujet ne remontera plus"' : '').'>'.sprintf('%03d', ($counter + 1)). '</td>
+                <td id="'.$reply['id'].'" class="reply anchor" '.($user ? 'style="border: 4px solid hsl('.(hexdec(substr(md5($reply['IP']), 0, 2))).',100%,75%);"' : '').'>
                 <div class="replyhead">
                 <input type="checkbox" name="del" value="'.$reply['id'].'">
                 <span class="name">'.(!empty($reply['email']) ? '<a href="mailto:'.$reply['email'].'">'.$reply['name'].'</a>' : $reply['name']).'</span>&nbsp;
@@ -902,8 +905,7 @@
         {
             $item = new Post();
             $post = $item->findOne('id', $id);
-            $this->data .= '<div class="doc">
-                <div class="box">
+            $this->data .= '<div class="box">
                 <div class="boxtitle">
                 Registrer un ban
                 </div>
@@ -960,7 +962,6 @@
                     </tr>
                 </table>
             </form>
-            </div>
             </div>
             </div>';
             return $this;
@@ -1171,7 +1172,7 @@
                 }
                 $page
                     ->navLinks($user, 0, 1)
-                    ->paginate(($i > 0 ? 1 : 0), (!$indexThreads ? 0 : 1), $i+1)
+                    ->paginate(($i > 0 ? 1 : 0), (count($indexThreads) < THREADS_PER_PAGE ? 0 : 1), $i+1)
                     ->footer();
                 if($user){
                     $page->render();
@@ -1283,9 +1284,6 @@
                 'upfile_name' => (isset($upfile_name) ? $upfile_name : '')
             ];
             $validPost = PostController::validate($postRequest, isset($image) ? $image : null); //Validation et création d'un objet Post
-            $validPost->create();
-            $validPost->insert();
-            PostController::bindQuotes($validPost->quotes, $validPost->id, $validPost->parent);
             if($validPost->parent > 0){
                 $OP = $post->findOneByID($validPost->parent);
                 $replyCount = count($post->findAll('parent', $validPost->parent));
@@ -1295,13 +1293,20 @@
                 $title = ROOT.' - '.(!empty($OP['subject']) ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30));
                 $parent = $validPost->parent;
             }else{
+                $replyCount = 0;
                 $OP = $post->findOneByID($validPost->id);
                 $title = ROOT.' - '.(!empty($validPost->subject) ? $validPost->subject : substr(strip_tags($validPost->message), 0, 30));
                 $parent = $validPost->id;
                 BoardController::prune();
             }
-            if($postRequest['email'] !== 'sage'){
+            if($postRequest['email'] !== 'sage' || $replyCount < MAX_BUMP){
                 $validPost->bump($parent);
+            }
+            $validPost->create();
+            $validPost->insert();
+            PostController::bindQuotes($validPost->quotes, $validPost->id, $validPost->parent);
+            if($replyCount >= MAX_REPLIES){
+                $post->update('locked', 1, 'id', $OP['id']);
             }
             $page
                 ->head($title)
