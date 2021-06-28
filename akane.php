@@ -186,10 +186,11 @@
         {
             $sql = "INSERT INTO {$this->table} SET ";
             foreach($this->values as $key=>$value){
-                $sql .= "{$key} = '{$value}', ";
+                $sql .= "{$key} = :{$key}, ";
             }
             $sql = substr($sql, 0, -2);
-            $this->pdo->query($sql);
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($this->values);
             $this->id = $this->pdo->lastInsertId();
         }
         /**
@@ -441,7 +442,7 @@
             $this->data .= '<!DOCTYPE html>
             <html lang="fr">
             <head>
-            <meta http-equiv="content-type" content="text/html;charset=UTF-8">
+            <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
             <meta http-equiv="cache-control" content="max-age=0">
             <meta http-equiv="cache-control" content="no-cache">
             <meta http-equiv="expires" content="0">
@@ -620,15 +621,20 @@
             }
             $this->data .= '
             <tr><td><textarea id="message" placeholder="Message" name="message" max="8000" style="width: -moz-available;height:80px;"></textarea></td></tr>';
-            if(UPLOADS){$this->data .= '
+            if(UPLOADS){
+                $this->data .= '
                 <tr><td><input type="file" name="upfile"></td></tr>';
+            }
+            if(VIDEO){
+                $this->data .= '
+                <tr><td><input type="text" name="video" placeholder="Lien de la vidéo" style="width: -moz-available;"></td></tr>';
             }
             $this->data .= '
             <tr><td><input type="password" placeholder="Mot de passe (pour supprimer)" name="password" style="width: -moz-available;"></td></tr>
             <tr><td><input type="submit" name="newpost" value="Envoyer"></td></tr><tr>
             <th colspan="2">
             <ul>
-                <li>'.(UPLOADS ? 'Il faut au moins une image ou du texte pour répondre.' : 'Il faut au moins un message pour répondre.').'</li>
+                <li>'.(UPLOADS ? 'Il faut au moins une image ou du texte pour répondre.' : 'Il faut au moins un message '.(VIDEO ? 'ou une vidéo' : '').' pour répondre.').'</li>
                 '.(UPLOADS ? '<li>Les formats supportés sont JPG, PNG et GIF.</li><li>Taille maximale du fichier: 3Mo.</li>' : '').
                 (VIDEO ? '<li>Un lecteur vidéo sera généré s\'il y a un lien</li><li>Plate-formes supportées: Youtube.</li>' : '').'
             </ul>
@@ -1280,19 +1286,24 @@
                 'email' => $_POST['email'],
                 'subject' => (isset($_POST['subject']) ? $_POST['subject'] : '' ),
                 'message' => $_POST['message'],
+                'video' => (isset($_POST['video']) ? $_POST['video'] : ''),
                 'password' => $_POST['password'],
                 'upfile_name' => (isset($upfile_name) ? $upfile_name : '')
             ];
             $validPost = PostController::validate($postRequest, isset($image) ? $image : null); //Validation et création d'un objet Post
+            $validPost->create();
             if($validPost->parent > 0){
                 $OP = $post->findOneByID($validPost->parent);
                 $replyCount = count($post->findAll('parent', $validPost->parent));
                 if($OP['locked'] == true || $replyCount >= MAX_REPLIES){
                     die('Ce sujet est verrouillé, vous ne pouvez plus répondre');
                 }
+                $validPost->insert();
                 $title = ROOT.' - '.(!empty($OP['subject']) ? $OP['subject'] : substr(strip_tags($OP['message']), 0, 30));
                 $parent = $validPost->parent;
+                $OP = $post->findOneByID($validPost->parent);
             }else{
+                $validPost->insert();
                 $replyCount = 0;
                 $OP = $post->findOneByID($validPost->id);
                 $title = ROOT.' - '.(!empty($validPost->subject) ? $validPost->subject : substr(strip_tags($validPost->message), 0, 30));
@@ -1302,8 +1313,6 @@
             if($postRequest['email'] !== 'sage' || $replyCount < MAX_BUMP){
                 $validPost->bump($parent);
             }
-            $validPost->create();
-            $validPost->insert();
             PostController::bindQuotes($validPost->quotes, $validPost->id, $validPost->parent);
             if($replyCount >= MAX_REPLIES){
                 $post->update('locked', 1, 'id', $OP['id']);
@@ -1403,7 +1412,7 @@
                 die('Il faut une image pour démarrer un sujet.');
             }
             if($post['parent'] > 0 && empty($post['message'])){
-                if(!$image){
+                if(!$image && empty($post['video'])){
                     die('Il faut au moins une image ou un message pour répondre');
                 }
             }
@@ -1438,6 +1447,9 @@
                 $validPost->quotes   = $quotes[2];
             }
             $validPost->message     = PostController::formatMessage($validPost->message, $validPost->parent);
+            if(VIDEO && $video = preg_replace('/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i', '<br><iframe width="336" height="189" src="https://www.youtube.com/embed/$2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>', $post['video'], 1)){
+                $validPost->message .= $video;
+            }
             if($image){
                 $validPost->upfile_name = htmlspecialchars($image->upfile_name);
                 $validPost->md5         = $image->md5;
@@ -1478,11 +1490,7 @@
          */
         static function formatMessage(string $message, string $parent): string
         {
-            if(VIDEO && preg_match('/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i', $message)){
-                $message = preg_replace('/\s*[a-zA-Z\/\/:\.]*youtu(be.com\/watch\?v=|.be\/)([a-zA-Z0-9\-_]+)([a-zA-Z0-9\/\*\-\_\?\&\;\%\=\.]*)/i', '<iframe width="336" height="189" src="https://www.youtube.com/embed/$2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>', $message, 1);
-            }else{
-                $message = preg_replace("~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~", "<a href=\"\\0\" target=\"_blank\" style=\"text-decoration:underline;\">\\0</a>", $message);
-            }
+            $message = preg_replace("~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~", "<a href=\"\\0\" target=\"_blank\" style=\"text-decoration:underline;\">\\0</a>", $message);
             $message = preg_replace('/(&gt;&gt;)([0-9]+)/', '<a class="replyLink" href="'.ROOT.RES_FOLDER.$parent.'#${2}">>>${2}</a>', $message);
             $message = preg_replace('/^(&gt;[^\>](.*))/m', '<span class="quote">${1}</span>', $message);
             return $message;
