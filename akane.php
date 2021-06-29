@@ -454,6 +454,27 @@
             <title>'.$title. '</title>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
             <script>
+            function setCookie(cname, cvalue, exdays) {
+                const d = new Date();
+                d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                let expires = "expires="+ d.toUTCString();
+                document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/" + ";SameSite=Lax";
+            }
+            function getCookie(cname) {
+                let name = cname + "=";
+                let decodedCookie = decodeURIComponent(document.cookie);
+                let ca = decodedCookie.split(\';\');
+                for(let i = 0; i <ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) == \' \') {
+                    c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
             function quotePost(postId){
                 $("#message").val($("#message").val() + postId + "\n");
                 return false;
@@ -466,6 +487,10 @@
                             quotePost(\'>>\'+postId);
                         }
                     }
+                }
+                let formPos = JSON.parse(getCookie("formPos"));
+                if (formPos != "") {
+                    $(\'#move\').css({"top":formPos["top"], "left":formPos["left"]});
                 }
                 $(\'.backlink, .replyLink\').mouseenter(function(){
                     var num=$(this).text().substr(2);
@@ -670,8 +695,12 @@
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
                 pos4 = e.clientY;
-                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                formPos = new Object;
+                formPos["top"] = (elmnt.offsetTop - pos2);
+                formPos["left"] = (elmnt.offsetLeft - pos1);
+                elmnt.style.top = formPos["top"] + "px";
+                elmnt.style.left = formPos["left"] + "px";
+                setCookie(\'formPos\', JSON.stringify(formPos), 365);
             }
 
             function closeDragElement() {
