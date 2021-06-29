@@ -1,4 +1,4 @@
-<img src="https://www.akane-ch.org/img/akane-capture.jpg">
+<img src="https://www.akane-ch.org/img/akane-capture.png">
 
 # Akane
 Akaihane Channel is a french image-board project created for https://www.akane-ch.org
